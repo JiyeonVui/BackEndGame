@@ -1,6 +1,51 @@
 @BackEndGame_HostAddress = http://localhost:5039
 
-GET {{BackEndGame_HostAddress}}/weatherforecast/
-Accept: application/json
+POST {{BackEndGame_HostAddress}}/api/users/login
+Content-Type: application/json
+
+{
+  "deviceId": "device-123"
+}
+
+###
+
+POST {{BackEndGame_HostAddress}}/api/users/login
+Content-Type: application/json
+
+{
+  "deviceId": "device-456"
+}
+
+###
+
+GET {{BackEndGame_HostAddress}}/api/users/search?deviceId=device-123
+
+###
+
+POST {{BackEndGame_HostAddress}}/api/friends/requests
+Content-Type: application/json
+
+{
+  "senderDeviceId": "device-123",
+  "receiverDeviceId": "device-456"
+}
+
+###
+
+GET {{BackEndGame_HostAddress}}/api/friends/requests/notifications?deviceId=device-456
+
+###
+
+POST {{BackEndGame_HostAddress}}/api/friends/requests/1/respond
+Content-Type: application/json
+
+{
+  "receiverDeviceId": "device-456",
+  "accept": true
+}
+
+###
+
+GET {{BackEndGame_HostAddress}}/api/friends?deviceId=device-123
 
 ###
