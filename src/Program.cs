@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.SignalR;
 using BackEndGame.Infrastructure;
 using BackEndGame.Infrastructure.Repositories;
 
@@ -6,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add Controllers
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -22,6 +24,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IFriendRequestRepository, FriendRequestRepository>();
 builder.Services.AddScoped<IFriendshipRepository, FriendshipRepository>();
 builder.Services.AddScoped<IFriendService, FriendService>();
+builder.Services.AddSingleton<IRealtimeConnectionTracker, InMemoryRealtimeConnectionTracker>();
 
 var app = builder.Build();
 
@@ -34,5 +37,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.MapControllers(); // QUAN TRỌNG
+app.MapHub<PresenceHub>("/hubs/presence");
 
 app.Run();
