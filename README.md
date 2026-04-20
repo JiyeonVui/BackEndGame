@@ -1,5 +1,11 @@
 # BackEndGame
 
+## Database
+
+- The API now uses PostgreSQL through Entity Framework Core.
+- Configure the connection string in `appsettings.json` or `appsettings.Development.json` under `ConnectionStrings:DefaultConnection`.
+- On startup, the app calls `Database.EnsureCreated()` so the initial schema is created automatically for local development.
+
 ## Realtime presence
 
 - SignalR hub: `/hubs/presence?deviceId={deviceId}`
