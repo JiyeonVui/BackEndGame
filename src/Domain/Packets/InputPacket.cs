@@ -7,7 +7,7 @@ namespace BackEndGame.Domain.Packets
     /// </summary>
     public struct InputPacket
     {
-        /// <summary>Monotonically increasing tick counter from the client, used for reconciliation.</summary>
+        /// <summary>Monotonically increasing tick counter from the client, used for reconciliation (Đôi chiếu).</summary>
         public uint Tick;
 
         /// <summary>Identifies which player sent this input.</summary>

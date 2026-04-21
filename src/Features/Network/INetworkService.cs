@@ -28,8 +28,16 @@ namespace BackEndGame.Features.Network
         void OnInputReceived(Action<Guid, InputPacket> handler);
 
         /// <summary>
-        /// Sends a match-start notification to all players in a match,
-        /// including the MatchId they should use for subsequent InputPacket routing.
+        /// Signal 1 of 2 — triggers Home → Loading screen transition on the client.
+        /// Sent immediately after matchmaking confirms a match, before the game loop begins.
+        /// Payload carries MatchId and each player's TeamId so the loading screen can
+        /// display team assignment while assets load on the client side.
+        /// </summary>
+        Task NotifyMatchFoundAsync(Guid matchId, List<string> team0DeviceIds, List<string> team1DeviceIds);
+
+        /// <summary>
+        /// Signal 2 of 2 — triggers Loading → Game screen transition on the client.
+        /// Sent after all players are added to the match SignalR group and the 64Hz loop is live.
         /// </summary>
         Task NotifyMatchStartedAsync(Guid matchId, IEnumerable<string> playerDeviceIds);
 

@@ -8,13 +8,11 @@
 /Users/manh/Documents/E-Learning/BackEndGame/bin/Debug/net8.0/Microsoft.AspNetCore.OpenApi.dll
 /Users/manh/Documents/E-Learning/BackEndGame/bin/Debug/net8.0/Microsoft.EntityFrameworkCore.dll
 /Users/manh/Documents/E-Learning/BackEndGame/bin/Debug/net8.0/Microsoft.EntityFrameworkCore.Abstractions.dll
-/Users/manh/Documents/E-Learning/BackEndGame/bin/Debug/net8.0/Microsoft.EntityFrameworkCore.InMemory.dll
 /Users/manh/Documents/E-Learning/BackEndGame/bin/Debug/net8.0/Microsoft.OpenApi.dll
 /Users/manh/Documents/E-Learning/BackEndGame/bin/Debug/net8.0/Npgsql.dll
 /Users/manh/Documents/E-Learning/BackEndGame/bin/Debug/net8.0/Swashbuckle.AspNetCore.Swagger.dll
 /Users/manh/Documents/E-Learning/BackEndGame/bin/Debug/net8.0/Swashbuckle.AspNetCore.SwaggerGen.dll
 /Users/manh/Documents/E-Learning/BackEndGame/bin/Debug/net8.0/Swashbuckle.AspNetCore.SwaggerUI.dll
-/Users/manh/Documents/E-Learning/BackEndGame/bin/Debug/net8.0/System.Diagnostics.DiagnosticSource.dll
 /Users/manh/Documents/E-Learning/BackEndGame/obj/Debug/net8.0/BackEndGame.csproj.AssemblyReference.cache
 /Users/manh/Documents/E-Learning/BackEndGame/obj/Debug/net8.0/BackEndGame.GeneratedMSBuildEditorConfig.editorconfig
 /Users/manh/Documents/E-Learning/BackEndGame/obj/Debug/net8.0/BackEndGame.AssemblyInfoInputs.cache
@@ -22,7 +20,6 @@
 /Users/manh/Documents/E-Learning/BackEndGame/obj/Debug/net8.0/BackEndGame.csproj.CoreCompileInputs.cache
 /Users/manh/Documents/E-Learning/BackEndGame/obj/Debug/net8.0/BackEndGame.MvcApplicationPartsAssemblyInfo.cs
 /Users/manh/Documents/E-Learning/BackEndGame/obj/Debug/net8.0/BackEndGame.MvcApplicationPartsAssemblyInfo.cache
-/Users/manh/Documents/E-Learning/BackEndGame/obj/Debug/net8.0/BackEndGame.sourcelink.json
 /Users/manh/Documents/E-Learning/BackEndGame/obj/Debug/net8.0/scopedcss/bundle/BackEndGame.styles.css
 /Users/manh/Documents/E-Learning/BackEndGame/obj/Debug/net8.0/staticwebassets.build.json
 /Users/manh/Documents/E-Learning/BackEndGame/obj/Debug/net8.0/staticwebassets.development.json
@@ -37,3 +34,7 @@
 /Users/manh/Documents/E-Learning/BackEndGame/obj/Debug/net8.0/staticwebassets/msbuild.buildTransitive.BackEndGame.props
 /Users/manh/Documents/E-Learning/BackEndGame/obj/Debug/net8.0/staticwebassets.pack.json
 /Users/manh/Documents/E-Learning/BackEndGame/obj/Debug/net8.0/BackEndGame.csproj.CopyComplete
+/Users/manh/Documents/E-Learning/BackEndGame/bin/Debug/net8.0/BepuPhysics.dll
+/Users/manh/Documents/E-Learning/BackEndGame/bin/Debug/net8.0/BepuUtilities.dll
+/Users/manh/Documents/E-Learning/BackEndGame/bin/Debug/net8.0/Microsoft.EntityFrameworkCore.Relational.dll
+/Users/manh/Documents/E-Learning/BackEndGame/bin/Debug/net8.0/Npgsql.EntityFrameworkCore.PostgreSQL.dll

@@ -1,3 +1,4 @@
+using BackEndGame.Features.Network;
 using BackEndGame.Game;
 
 namespace BackEndGame.Features.GameLoop
@@ -17,13 +18,15 @@ namespace BackEndGame.Features.GameLoop
     public class GameLoopService : BackgroundService
     {
         private readonly IMatchManager _matchManager;
+        private readonly INetworkService _networkService;
         private readonly ILogger<GameLoopService> _logger;
 
         private static readonly TimeSpan MonitorInterval = TimeSpan.FromSeconds(5);
 
-        public GameLoopService(IMatchManager matchManager, ILogger<GameLoopService> logger)
+        public GameLoopService(IMatchManager matchManager, INetworkService networkService, ILogger<GameLoopService> logger)
         {
             _matchManager = matchManager;
+            _networkService = networkService;
             _logger = logger;
         }
 
@@ -61,13 +64,28 @@ namespace BackEndGame.Features.GameLoop
         }
 
         /// <summary>
-        /// Convenience wrapper called by the matchmaking REST controller.
-        /// Delegates to IMatchManager.CreateMatch() and returns the new MatchId
-        /// so the controller can return it to PlayFab / the client.
+        /// Called by the matchmaking REST controller once two teams are confirmed.
+        /// Orchestrates the full match creation + client notification sequence:
+        ///
+        ///   1. CreateMatch    — initialises physics, spawns players, starts 64Hz loop.
+        ///   2. NotifyMatchFound   — sends "match:found" → clients switch Home → Loading screen.
+        ///   3. NotifyMatchStarted — adds clients to SignalR group, sends "match:started"
+        ///                           → clients switch Loading → Game screen.
+        ///
+        /// Returns the MatchId for the REST controller to pass back to PlayFab / the client.
         /// </summary>
-        public Guid StartMatch(List<string> playerDeviceIds)
+        public async Task<Guid> StartMatchAsync(List<string> team0DeviceIds, List<string> team1DeviceIds)
         {
-            var match = _matchManager.CreateMatch(playerDeviceIds);
+            var match = _matchManager.CreateMatch(team0DeviceIds, team1DeviceIds);
+
+            // Signal 1: Home → Loading screen
+            await _networkService.NotifyMatchFoundAsync(match.MatchId, team0DeviceIds, team1DeviceIds);
+
+            // Signal 2: Loading → Game screen (also joins SignalR group for tick broadcasts)
+            var allDeviceIds = team0DeviceIds.Concat(team1DeviceIds);
+            await _networkService.NotifyMatchStartedAsync(match.MatchId, allDeviceIds);
+
+            _logger.LogInformation("Match {MatchId} fully started and clients notified", match.MatchId);
             return match.MatchId;
         }
 

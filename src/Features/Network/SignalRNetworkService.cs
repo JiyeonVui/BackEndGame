@@ -74,9 +74,42 @@ namespace BackEndGame.Features.Network
         }
 
         /// <summary>
+        /// Signal 1 of 2 — triggers Home → Loading screen on each client.
+        /// Sends "match:found" directly to each player's connection (not via group yet).
+        /// Payload: { matchId, teamId } so the loading screen knows team assignment.
+        /// </summary>
+        public async Task NotifyMatchFoundAsync(Guid matchId, List<string> team0DeviceIds, List<string> team1DeviceIds)
+        {
+            var tasks = new List<Task>();
+
+            foreach (var deviceId in team0DeviceIds)
+            {
+                if (!_deviceToConnection.TryGetValue(deviceId, out var connectionId)) continue;
+                tasks.Add(_hubContext.Clients.Client(connectionId).SendAsync("match:found", new
+                {
+                    matchId,
+                    teamId = 0
+                }));
+            }
+
+            foreach (var deviceId in team1DeviceIds)
+            {
+                if (!_deviceToConnection.TryGetValue(deviceId, out var connectionId)) continue;
+                tasks.Add(_hubContext.Clients.Client(connectionId).SendAsync("match:found", new
+                {
+                    matchId,
+                    teamId = 1
+                }));
+            }
+
+            await Task.WhenAll(tasks);
+        }
+
+        /// <summary>
+        /// Signal 2 of 2 — triggers Loading → Game screen on each client.
         /// Adds each player's ConnectionId to the SignalR group "match:{matchId}"
         /// so future BroadcastGameStateAsync calls reach all of them at once.
-        /// Then sends a "match:started" event with the matchId to each player's client.
+        /// Then sends a "match:started" event confirming the loop is live.
         /// </summary>
         public async Task NotifyMatchStartedAsync(Guid matchId, IEnumerable<string> playerDeviceIds)
         {

@@ -34,9 +34,9 @@ namespace BackEndGame.Game
         /// then fires off a background Task running the 64Hz game loop.
         /// The loop task is stored (not awaited) — it runs until the CancellationToken is cancelled.
         /// </summary>
-        public Match CreateMatch(List<string> playerDeviceIds)
+        public Match CreateMatch(List<string> team0DeviceIds, List<string> team1DeviceIds)
         {
-            var match = new Match(Guid.NewGuid(), playerDeviceIds);
+            var match = new Match(Guid.NewGuid(), team0DeviceIds, team1DeviceIds);
             match.Start();
 
             var cts = new CancellationTokenSource();
@@ -46,7 +46,8 @@ namespace BackEndGame.Game
             var loopTask = Task.Run(() => RunMatchLoopAsync(match, cts.Token), cts.Token);
             _matchTasks[match.MatchId] = loopTask;
 
-            _logger.LogInformation("Match {MatchId} created with {PlayerCount} players", match.MatchId, playerDeviceIds.Count);
+            _logger.LogInformation("Match {MatchId} created — Team0: {T0}, Team1: {T1}",
+                match.MatchId, team0DeviceIds.Count, team1DeviceIds.Count);
             return match;
         }
 

@@ -9,13 +9,13 @@ namespace BackEndGame.Game
     public interface IMatchManager
     {
         /// <summary>
-        /// Creates a new isolated Match for the given players, loads the map, and
+        /// Creates a new isolated Match for two teams of players, loads the map, and
         /// starts the match loop task. Returns the created Match instance.
         /// </summary>
-        Match CreateMatch(List<string> playerDeviceIds);
+        Match CreateMatch(List<string> team0DeviceIds, List<string> team1DeviceIds);
 
         /// <summary>
-        /// Cancels the match loop, disposes physics/navmesh resources, reports final
+        /// Cancels the match loop, disposes physics resources, reports final
         /// stats to PlayFab, and removes the match from the active dictionary.
         /// </summary>
         Task DestroyMatchAsync(Guid matchId);
