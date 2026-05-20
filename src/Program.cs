@@ -12,7 +12,13 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 // Add Controllers
 builder.Services.AddControllers();
-builder.Services.AddSignalR();
+builder.Services.AddSignalR()
+    .AddJsonProtocol(options =>
+    {
+        options.PayloadSerializerOptions.IncludeFields = true;
+        options.PayloadSerializerOptions.PropertyNamingPolicy = null;          // serialize as PascalCase (matches Unity field names)
+        options.PayloadSerializerOptions.PropertyNameCaseInsensitive = true;   // accept PascalCase from Unity on deserialize
+    });
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -33,7 +39,8 @@ builder.Services.AddSingleton<IRealtimeConnectionTracker, InMemoryRealtimeConnec
 builder.Services.AddSingleton<SignalRNetworkService>();
 builder.Services.AddSingleton<INetworkService>(sp => sp.GetRequiredService<SignalRNetworkService>());
 builder.Services.AddSingleton<IMatchManager, MatchManager>();
-builder.Services.AddHostedService<GameLoopService>();
+builder.Services.AddSingleton<GameLoopService>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<GameLoopService>());
 
 var app = builder.Build();
 

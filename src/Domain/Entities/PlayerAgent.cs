@@ -23,7 +23,8 @@ namespace BackEndGame.Domain.Entities
         /// Handle to the BEPU capsule body for this player.
         /// Set during Match.SpawnPlayers() and used each tick in ProcessPlayerInputs().
         /// Type is object to avoid a hard compile dependency on BEPUphysics before the package is added.
-        /// Replace with the concrete() BEPU BodyHandle / BodyReference type when integrating(tích hợp).
+        /// Replace with the concrete()
+        /// BEPU BodyHandle / BodyReference type when integrating(tích hợp).
         /// </summary>
         public object? PhysicsBodyHandle { get; set; }
 

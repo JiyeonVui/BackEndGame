@@ -10,21 +10,27 @@ public class UserService : IUserService
         _userRepository = userRepository;
     }
 
-    public async Task<User> LoginAsync(string deviceId)
+    public async Task<User> LoginAsync(string deviceId, string? userName = null)
     {
         var normalizedDeviceId = NormalizeDeviceId(deviceId);
+        var normalizedUserName = string.IsNullOrWhiteSpace(userName) ? null : userName.Trim();
+
         var user = await _userRepository.GetByDeviceIdAsync(normalizedDeviceId);
 
         if (user != null)
         {
+            if (normalizedUserName != null && user.UserName != normalizedUserName)
+            {
+                user.UserName = normalizedUserName;
+                await _userRepository.SaveAsync();
+            }
             return user;
         }
 
-        // The first login from a device creates a guest account.
         user = new User
         {
             DeviceId = normalizedDeviceId,
-            UserName = "Guest_" + Guid.NewGuid().ToString("N")[..6]
+            UserName = normalizedUserName ?? "Guest_" + Guid.NewGuid().ToString("N")[..6]
         };
 
         await _userRepository.AddAsync(user);

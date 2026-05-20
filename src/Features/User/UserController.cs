@@ -21,7 +21,7 @@ public class UserController : ControllerBase
             return BadRequest("DeviceId is required");
         }
 
-        var user = await _userService.LoginAsync(request.DeviceId);
+        var user = await _userService.LoginAsync(request.DeviceId, request.UserName);
         return Ok(user);
     }
 

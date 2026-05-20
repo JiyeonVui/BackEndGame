@@ -5,29 +5,17 @@ namespace BackEndGame.Domain.Packets
     /// Contains all player input for a single simulation step.
     /// The server uses this to drive movement, shooting, and action logic.
     /// </summary>
-    public struct InputPacket
+    public class InputPacket
     {
-        /// <summary>Monotonically increasing tick counter from the client, used for reconciliation (Đôi chiếu).</summary>
-        public uint Tick;
-
-        /// <summary>Identifies which player sent this input.</summary>
-        public byte PlayerId;
-
-        /// <summary>Horizontal movement axis (-1 to 1). Mapped to BEPU capsule velocity X.</summary>
-        public float MoveX;
-
-        /// <summary>Forward/backward movement axis (-1 to 1). Mapped to BEPU capsule velocity Z.</summary>
-        public float MoveZ;
-
-        /// <summary>Yaw (left/right) look angle in degrees.</summary>
-        public float LookYaw;
-
-        /// <summary>Pitch (up/down) look angle in degrees, clamped on server to prevent cheating.</summary>
-        public float LookPitch;
-
-        public bool IsShooting;
-        public bool IsJumping;
-        public bool IsCrouching;
-        public bool IsSprinting;
+        public uint Tick { get; set; }
+        public byte PlayerId { get; set; }
+        public float MoveX { get; set; }
+        public float MoveZ { get; set; }
+        public float LookYaw { get; set; }
+        public float LookPitch { get; set; }
+        public bool IsShooting { get; set; }
+        public bool IsJumping { get; set; }
+        public bool IsCrouching { get; set; }
+        public bool IsSprinting { get; set; }
     }
 }

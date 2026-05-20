@@ -20,6 +20,7 @@ namespace BackEndGame.Features.Network
     {
         // IHubContext lets us push messages to clients from outside a Hub class.
         private readonly IHubContext<GameHub> _hubContext;
+        private readonly ILogger<SignalRNetworkService> _logger;
 
         private Action<Guid, InputPacket>? _inputHandler;
 
@@ -32,9 +33,10 @@ namespace BackEndGame.Features.Network
         private readonly ConcurrentDictionary<string, Guid> _connectionToMatch = new(StringComparer.OrdinalIgnoreCase);
         private readonly object _matchConnectionsLock = new();
 
-        public SignalRNetworkService(IHubContext<GameHub> hubContext)
+        public SignalRNetworkService(IHubContext<GameHub> hubContext, ILogger<SignalRNetworkService> logger)
         {
             _hubContext = hubContext;
+            _logger = logger;
         }
 
         // ─── INetworkService ──────────────────────────────────────────────────────
@@ -82,23 +84,27 @@ namespace BackEndGame.Features.Network
         {
             var tasks = new List<Task>();
 
-            foreach (var deviceId in team0DeviceIds)
+            for (int i = 0; i < team0DeviceIds.Count; i++)
             {
+                var deviceId = team0DeviceIds[i];
                 if (!_deviceToConnection.TryGetValue(deviceId, out var connectionId)) continue;
                 tasks.Add(_hubContext.Clients.Client(connectionId).SendAsync("match:found", new
                 {
                     matchId,
-                    teamId = 0
+                    teamId = 0,
+                    playerId = (byte)i
                 }));
             }
 
-            foreach (var deviceId in team1DeviceIds)
+            for (int i = 0; i < team1DeviceIds.Count; i++)
             {
+                var deviceId = team1DeviceIds[i];
                 if (!_deviceToConnection.TryGetValue(deviceId, out var connectionId)) continue;
                 tasks.Add(_hubContext.Clients.Client(connectionId).SendAsync("match:found", new
                 {
                     matchId,
-                    teamId = 1
+                    teamId = 1,
+                    playerId = (byte)(team0DeviceIds.Count + i)
                 }));
             }
 
@@ -119,7 +125,13 @@ namespace BackEndGame.Features.Network
             foreach (var deviceId in playerDeviceIds)
             {
                 if (!_deviceToConnection.TryGetValue(deviceId, out var connectionId))
+                {
+                    _logger.LogWarning("[SignalR] NotifyMatchStarted — deviceId={DeviceId} not found in connection map, skipping", deviceId);
                     continue;
+                }
+
+                _logger.LogInformation("[SignalR] NotifyMatchStarted — adding deviceId={DeviceId} connId={ConnId} to group={Group}",
+                    deviceId, connectionId, group);
 
                 lock (_matchConnectionsLock)
                 {
@@ -182,6 +194,27 @@ namespace BackEndGame.Features.Network
         public Guid? GetMatchIdForConnection(string connectionId)
         {
             return _connectionToMatch.TryGetValue(connectionId, out var matchId) ? matchId : null;
+        }
+
+        /// <summary>
+        /// Removes a connection from match tracking and returns the number of players
+        /// still connected to that match. Returns -1 if the connection wasn't in any match.
+        /// Called on disconnect to decide whether to destroy the match.
+        /// </summary>
+        public int RemoveConnectionFromMatch(string connectionId)
+        {
+            if (!_connectionToMatch.TryRemove(connectionId, out var matchId))
+                return -1;
+
+            lock (_matchConnectionsLock)
+            {
+                if (_matchConnections.TryGetValue(matchId, out var set))
+                {
+                    set.Remove(connectionId);
+                    return set.Count;
+                }
+            }
+            return 0;
         }
 
         public void InvokeInputHandler(Guid matchId, InputPacket input)

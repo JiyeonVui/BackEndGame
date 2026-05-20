@@ -13,7 +13,7 @@ namespace BackEndGame.Game
         /// starts the match loop task. Returns the created Match instance.
         /// </summary>
         Match CreateMatch(List<string> team0DeviceIds, List<string> team1DeviceIds);
-
+        
         /// <summary>
         /// Cancels the match loop, disposes physics resources, reports final
         /// stats to PlayFab, and removes the match from the active dictionary.
@@ -36,3 +36,4 @@ namespace BackEndGame.Game
         IReadOnlyCollection<Guid> GetActiveMatchIds();
     }
 }
+

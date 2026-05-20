@@ -5,31 +5,21 @@ namespace BackEndGame.Domain.Packets
     /// Contains the authoritative world snapshot: positions, HP, and team info.
     /// Clients use this to interpolate rendering — no logic runs on client.
     /// </summary>
-    public struct GameStatePacket
+    public class GameStatePacket
     {
-        /// <summary>Server tick this snapshot was captured at. Client uses this to detect dropped packets.</summary>
-        public uint Tick;
-
-        public PlayerState[] Players;
+        public uint Tick { get; set; }
+        public PlayerState[] Players { get; set; } = [];
     }
 
-    /// <summary>
-    /// Authoritative state for one player in a tick snapshot.
-    /// </summary>
-    public struct PlayerState
+    public class PlayerState
     {
-        public byte PlayerId;
-
-        /// <summary>0 = Team A, 1 = Team B. Client uses this to colour player models and determine hit validity.</summary>
-        public byte TeamId;
-
-        /// <summary>World-space position after BEPU physics step.</summary>
-        public float PosX, PosY, PosZ;
-
-        /// <summary>Horizontal facing angle in degrees.</summary>
-        public float RotYaw;
-
-        public float Hp;
-        public bool IsAlive;
+        public byte PlayerId { get; set; }
+        public byte TeamId { get; set; }
+        public float PosX { get; set; }
+        public float PosY { get; set; }
+        public float PosZ { get; set; }
+        public float RotYaw { get; set; }
+        public float Hp { get; set; }
+        public bool IsAlive { get; set; }
     }
 }

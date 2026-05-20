@@ -128,6 +128,10 @@ namespace BackEndGame.Game
                 var tickStart = DateTime.UtcNow;
 
                 var state = match.Tick();
+                _logger.LogDebug("[MatchManager] Tick={Tick} Players={Count} — {States}",
+                    state.Tick, state.Players.Length,
+                    string.Join(" | ", state.Players.Select(p => $"P{p.PlayerId}({p.PosX:F1},{p.PosY:F1},{p.PosZ:F1}) hp={p.Hp}")));
+
                 await _networkService.BroadcastGameStateAsync(match.MatchId, state);
 
                 if (match.LastResult != MatchResult.Ongoing)

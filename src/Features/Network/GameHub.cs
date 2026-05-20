@@ -1,4 +1,5 @@
 using BackEndGame.Domain.Packets;
+using BackEndGame.Features.GameLoop;
 using BackEndGame.Game;
 using Microsoft.AspNetCore.SignalR;
 
@@ -20,11 +21,43 @@ namespace BackEndGame.Features.Network
     {
         private readonly IMatchManager _matchManager;
         private readonly SignalRNetworkService _networkService;
+        private readonly GameLoopService _gameLoopService;
+        private readonly ILogger<GameHub> _logger;
 
-        public GameHub(IMatchManager matchManager, SignalRNetworkService networkService)
+        private const int MatchmakingDelayMs = 5000;
+
+        public GameHub(IMatchManager matchManager, SignalRNetworkService networkService, GameLoopService gameLoopService, ILogger<GameHub> logger)
         {
             _matchManager = matchManager;
             _networkService = networkService;
+            _gameLoopService = gameLoopService;
+            _logger = logger;
+        }
+
+        /// <summary>
+        /// Called by the Unity client to enter matchmaking queue.
+        /// Returns immediately; match:found + match:started are pushed via SignalR once ready.
+        /// </summary>
+        public Task FindGame(string deviceId)
+        {
+            _logger.LogInformation("[GameHub] FindGame called by deviceId={DeviceId} connId={ConnId}", deviceId, Context.ConnectionId);
+
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await Task.Delay(MatchmakingDelayMs);
+                    _logger.LogInformation("[GameHub] Starting match for deviceId={DeviceId}", deviceId);
+                    await _gameLoopService.StartMatchAsync(
+                        team0DeviceIds: new List<string> { deviceId },
+                        team1DeviceIds: new List<string>());
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "[GameHub] StartMatchAsync failed for deviceId={DeviceId}", deviceId);
+                }
+            });
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -39,7 +72,11 @@ namespace BackEndGame.Features.Network
         {
             var knownMatch = _networkService.GetMatchIdForConnection(Context.ConnectionId);
             if (knownMatch == null || knownMatch != matchId)
-                return Task.CompletedTask; // Connection not registered to this match — drop packet
+            {
+                _logger.LogWarning("[GameHub] SendInput DROPPED — connId={ConnId} knownMatch={Known} requestedMatch={Req}",
+                    Context.ConnectionId, knownMatch, matchId);
+                return Task.CompletedTask;
+            }
 
             _matchManager.RouteInputToMatch(matchId, input);
             return Task.CompletedTask;
@@ -73,13 +110,14 @@ namespace BackEndGame.Features.Network
 
             if (matchId.HasValue)
             {
-                var match = _matchManager.GetMatch(matchId.Value);
-                if (match != null)
+                var remaining = _networkService.RemoveConnectionFromMatch(Context.ConnectionId);
+                _logger.LogInformation("[GameHub] Player disconnected from match {MatchId} — {Remaining} player(s) remaining",
+                    matchId.Value, remaining);
+
+                if (remaining == 0)
                 {
-                    // No remaining connected players in this match — destroy it
-                    var remainingConnected = _networkService.GetMatchIdForConnection(Context.ConnectionId);
-                    if (remainingConnected == null)
-                        await _matchManager.DestroyMatchAsync(matchId.Value);
+                    _logger.LogInformation("[GameHub] No players left in match {MatchId}, destroying", matchId.Value);
+                    await _matchManager.DestroyMatchAsync(matchId.Value);
                 }
             }
 

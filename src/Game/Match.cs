@@ -125,7 +125,7 @@ namespace BackEndGame.Game
             ProcessPlayerInputs(inputs);
             ProcessWeaponFiring(inputs);
             StepPhysics();
-            LastResult = CheckWinLoseConditions();
+            // LastResult = CheckWinLoseConditions(); // TODO: re-enable after flow testing
             _tick++;
             return BuildGameStatePacket();
         }
